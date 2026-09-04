@@ -21,7 +21,7 @@
             user-select: none; /* 防止文字被選取 */
         }
 
-     /* --- 這裡加上強制手機直立時轉為橫向顯示的魔法 --- */
+        /* --- 這裡加上強制手機直立時轉為橫向顯示的魔法 --- */
         @media screen and (orientation: portrait) {
             body {
                 transform: rotate(90deg);
@@ -105,30 +105,30 @@
             100% { transform: translateY(-60px) scale(1.5); opacity: 0; }
         }
 
-        /* 第五步：靜態放大版留言板 */
+        /* 第五步：靜態放大版留言板 (調整尺寸以符合紅線框) */
         #message-board {
             position: absolute;
-            top: 8%; /* 往上拉一點 */
-            right: 3%; /* 往右靠一點 */
-            width: 48vw; /* 增加寬度佔比 */
-            max-width: 500px; /* 放寬最大寬度限制 */
-            height: 60vh; /* 增加高度 */
+            top: 5%; /* 往上推，對齊紅線頂端 */
+            right: 2%; /* 往右推，對齊紅線右邊界 */
+            width: 58%; /* 寬度加寬，讓它更靠近小新 */
+            max-width: 500px; /* 放寬最大限制 */
+            height: 50%; /* 高度大幅拉長，對齊底部 */
             background: rgba(255, 255, 255, 0.95);
             border: 3px dashed #ffa502;
             border-radius: 20px;
-            padding: 25px;
+            padding: 15px 20px; /* 微調內邊距，讓文字有更多空間 */
             display: none;
             z-index: 5;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* 換成固定陰影，拿掉動畫 */
-            overflow-y: auto; /* 如果內容太多可以滾動 */
-            box-sizing: border-box; /* 確保 padding 不會撐破外框 */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            overflow-y: auto; 
+            box-sizing: border-box; 
         }
-        #message-board h2 { margin: 0 0 15px 0; text-align: center; }
+        #message-board h2 { margin: 0 0 10px 0; text-align: center; }
         #message-board p {
-            font-size: 1.1rem;
-            line-height: 1.6; /* 增加行距讓閱讀更舒服 */
+            font-size: 1rem; /* 稍微縮小一點點字體，讓排版在手機上更順暢 */
+            line-height: 1.5; 
             color: #2f3542;
-            margin: 8px 0;
+            margin: 6px 0;
         }
         
         /* 第五步：署名 */
