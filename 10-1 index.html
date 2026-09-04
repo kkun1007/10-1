@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="點開查看專屬訊息 🎁" />
+    <meta property="og:description" content="點擊進入查看神秘內容..." />
+    <title>神秘驚喜</title>
+    <style>
+        
+        /* 重置基本樣式並隱藏捲軸 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            /* 將背景色改為純白，與小新圖片底色融合 */
+            background-color: #ffffff; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none; /* 防止文字被選取 */
+        }
+
+        /* 強制橫向模式提示 */
+        #portrait-warning {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(50, 50, 50, 0.95);
+            color: white;
+            z-index: 9999;
+            text-align: center;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+        }
+        @media (orientation: portrait) {
+            #portrait-warning { display: flex; }
+            #main-container { display: none; }
+        }
+        @media (orientation: landscape) {
+            #portrait-warning { display: none; }
+            #main-container { display: block; }
+        }
+
+        /* 主容器與圖片設定 */
+        #main-container { position: relative; width: 100%; height: 100%; }
+        
+        .main-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%; /* 預設在正中間 */
+            transform: translate(-50%, -50%);
+            max-height: 100%;
+            max-width: 100%;
+            object-fit: contain;
+            z-index: 1;
+            /* 拿掉了 left 的動畫，讓他瞬間改變位置 */
+            transition: opacity 0.3s; 
+        }
+
+        /* 化學元素圖片樣式 */
+        .element-img {
+            position: absolute;
+            width: 18vw; /* 依畫面寬度響應式調整 */
+            max-width: 180px;
+            z-index: 2;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            border-radius: 50%;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15); /* 增加立體感 */
+        }
+        #zn { top: 5%; left: 5%; }
+        #rb { top: 5%; right: 5%; }
+        #ca { bottom: 5%; left: 5%; }
+        #ra { bottom: 5%; right: 5%; }
+
+        /* 操作按鈕 */
+        #action-btn {
+            position: absolute;
+            bottom: 8%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            padding: 12px 35px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background-color: #ff6b81;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(255, 107, 129, 0.4);
+            transition: all 0.2s;
+        }
+        #action-btn:active {
+            transform: translateX(-50%) scale(0.95);
+            box-shadow: 0 2px 8px rgba(255, 107, 129, 0.4);
+        }
+
+        /* 點擊空白處的愛心動畫 */
+        .heart-click {
+            position: absolute;
+            font-size: 28px;
+            color: #ff4757;
+            pointer-events: none; /* 確保不阻擋後方點擊 */
+            z-index: 100;
+            animation: floatUp 1s ease-out forwards;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.5); opacity: 1; }
+            50% { transform: translateY(-30px) scale(1.2); opacity: 0.8; }
+            100% { transform: translateY(-60px) scale(1.5); opacity: 0; }
+        }
+
+        /* 第五步：靜態放大版留言板 */
+        #message-board {
+            position: absolute;
+            top: 8%; /* 往上拉一點 */
+            right: 3%; /* 往右靠一點 */
+            width: 48vw; /* 增加寬度佔比 */
+            max-width: 500px; /* 放寬最大寬度限制 */
+            height: 60vh; /* 增加高度 */
+            background: rgba(255, 255, 255, 0.95);
+            border: 3px dashed #ffa502;
+            border-radius: 20px;
+            padding: 25px;
+            display: none;
+            z-index: 5;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* 換成固定陰影，拿掉動畫 */
+            overflow-y: auto; /* 如果內容太多可以滾動 */
+            box-sizing: border-box; /* 確保 padding 不會撐破外框 */
+        }
+        #message-board h2 { margin: 0 0 15px 0; text-align: center; }
+        #message-board p {
+            font-size: 1.1rem;
+            line-height: 1.6; /* 增加行距讓閱讀更舒服 */
+            color: #2f3542;
+            margin: 8px 0;
+        }
+        
+        /* 第五步：署名 */
+        #signature {
+            position: absolute;
+            bottom: 5%;
+            right: 5%;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #ff4757;
+            display: none;
+            z-index: 5;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 8px 20px;
+            border-radius: 15px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="birthday-song" src="happy_birthday.mp3" preload="auto"></audio>
+
+    <div id="main-container">
+        <img id="main-shin" class="main-bg" src="蠟筆小新 化學.jpg" alt="蠟筆小新">
+
+        <img id="zn" class="element-img" src="Zn.jpg" alt="Zn">
+        <img id="rb" class="element-img" src="Rb.jpg" alt="Rb">
+        <img id="ca" class="element-img" src="Ca.jpg" alt="Ca">
+        <img id="ra" class="element-img" src="Ra.jpg" alt="Ra">
+
+        <button id="action-btn">點擊發現驚喜</button>
+
+        <div id="message-board">
+            <h2>🎉    🎉</h2>
+            <p>有猜到ZnRbCaRa的意思嗎？</p>
+            <p>用化學元素表示生日快樂，音勉強接近像了，找不到完全一樣的</p>
+            <p>恭喜比我早加入2開頭的行列</p>
+            <p>新的開始 希望你可以每天一樣過得開心</p>
+            <p>祝你交到大帥哥</p>
+            <p>祝你發大財養我</p>
+            <p>改天再一起吃飯、打麻將</p>
+            <p>有事情也可以找我討論看看，說不定有甚麼幫助</p>
+            <p>😀🙂</p>
+            <p><small style="color: #888;">(點擊背景空白處試試看！)</small></p>
+        </div>
+
+        <div id="signature">KUN</div>
+    </div>
+    
+    <script>
+        let clickCount = 0;
+        const mainShin = document.getElementById('main-shin');
+        const btn = document.getElementById('action-btn');
+        const bgm = document.getElementById('birthday-song');
+
+        // 定義顯示與隱藏元素的函數
+        function showElement(id) {
+            const el = document.getElementById(id);
+            el.style.display = 'block';
+            // 使用 setTimeout 讓 display block 先作用，再改變透明度以觸發漸變動畫
+            setTimeout(() => { el.style.opacity = '1'; }, 20);
+        }
+
+        function hideElement(id) {
+            const el = document.getElementById(id);
+            el.style.opacity = '0';
+            setTimeout(() => { el.style.display = 'none'; }, 500);
+        }
+
+        // 核心按鈕邏輯
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation(); // 阻止按鈕點擊觸發背景愛心
+            clickCount++;
+
+            switch(clickCount) {
+                case 1:
+                    // 左上角出現 Zn
+                    showElement('zn');
+                    btn.innerText = "繼續點擊";
+                    break;
+                case 2:
+                    // 換圖2，右上角出現 Rb
+                    mainShin.src = '蠟筆小新 化學2.jpg';
+                    showElement('rb');
+                    break;
+                case 3:
+                    // 換圖1，左下角出現 Ca
+                    mainShin.src = '蠟筆小新 化學.jpg';
+                    showElement('ca');
+                    break;
+                case 4:
+                    // 換圖2，右下角出現 Ra
+                    mainShin.src = '蠟筆小新 化學2.jpg';
+                    showElement('ra');
+                    btn.innerText = "開啟最終驚喜！";
+                    break;
+                case 5:
+                    // 畫面淨空，只留圖2，顯示留言板、署名、播音樂
+                    hideElement('zn');
+                    hideElement('rb');
+                    hideElement('ca');
+                    hideElement('ra');
+                    
+                    mainShin.src = '蠟筆小新 化學2.jpg';
+                    
+                    // 把蠟筆小新的中心點瞬間設定在偏左的位置
+                    mainShin.style.left = '35%'; 
+                    
+                    document.getElementById('message-board').style.display = 'block';
+                    document.getElementById('signature').style.display = 'block';
+                    btn.style.display = 'none'; // 隱藏按鈕
+                    
+                    // 播放生日快樂歌
+                    if (bgm) {
+                        bgm.play().catch(error => console.log("音樂播放被瀏覽器阻擋:", error));
+                    }
+                    break;
+            }
+        });
+
+        // 點擊空白處出現愛心動畫邏輯
+        document.addEventListener('click', (e) => {
+            // 點擊按鈕或留言板時不產生愛心
+            if(e.target.id === 'action-btn' || e.target.closest('#message-board')) return;
+
+            const heart = document.createElement('div');
+            heart.className = 'heart-click';
+            heart.innerHTML = '❤';
+            
+            // 讓愛心出現在滑鼠/手指點擊的中心位置
+            heart.style.left = (e.clientX - 14) + 'px'; 
+            heart.style.top = (e.clientY - 14) + 'px';
+            
+            document.body.appendChild(heart);
+
+            // 動畫結束後移除元素，避免佔用記憶體
+            setTimeout(() => { 
+                heart.remove(); 
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
